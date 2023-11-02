@@ -7,10 +7,8 @@ use halo2_proofs::{
     circuit::{Layouter, SimpleFloorPlanner, Value},
     plonk::*,
     poly::Rotation,
+    arithmetic::FieldExt,
 };
-use halo2curves::ff::PrimeField;
-
-
 
 #[derive(Clone)]
 struct LookupConfig {
@@ -20,12 +18,12 @@ struct LookupConfig {
     t2: Column<Advice>
 }
 
-struct LookupChip<F: PrimeField> {
+struct LookupChip<F: FieldExt> {
     config: LookupConfig,
     _marker: PhantomData<F>,
 }
 
-impl<F: PrimeField> LookupChip<F> {
+impl<F: FieldExt> LookupChip<F> {
     fn construct(config: LookupConfig) -> Self {
         LookupChip {
             config,
@@ -41,7 +39,7 @@ impl<F: PrimeField> LookupChip<F> {
 
         meta.enable_equality(a);
 
-        let one = Expression::Constant(F::ONE);
+        let one = Expression::Constant(F::one());
 
         // meta.lookup("lookup", |meta| {
         //     let cur_a = meta.query_advice(a, Rotation::cur());
@@ -117,11 +115,11 @@ impl<F: PrimeField> LookupChip<F> {
 }
 
 #[derive(Default)]
-struct MyCircuit<F: PrimeField> {
+struct MyCircuit<F: FieldExt> {
     a: Vec<Value<F>>,
 }
 
-impl<F: PrimeField> Circuit<F> for MyCircuit<F> {
+impl<F: FieldExt> Circuit<F> for MyCircuit<F> {
     type Config = LookupConfig;
     type FloorPlanner = SimpleFloorPlanner;
 
